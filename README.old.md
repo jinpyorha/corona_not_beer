@@ -1,1 +1,0 @@
-# corona_not_beer
