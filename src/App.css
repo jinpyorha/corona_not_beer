@@ -14,14 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
 }
 
 .App-link {
@@ -36,3 +29,30 @@
     transform: rotate(360deg);
   }
 }
+
+.linebreak{
+  white-space: pre;
+}
+/* line break */
+.blueBox{
+  border-radius: 8px;
+  background-color: #039bef;
+  }
+
+.redBox{
+  border-radius: 8px;
+  background-color: red;
+  }
+
+
+.greenBox{
+  border-radius: 8px;
+  background-color: green;
+
+  }
+
+.yellowBox{
+  border-radius: 8px;
+  background-color: yellow;
+
+  }
