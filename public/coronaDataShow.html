@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+	<head>
+	</head>
+	<body>
+	<form href="coronaDataShow.html">
+		<select name="region" id="region">
+
+		</select>
+		<input type="submit" value="find">
+	</form>
+	<div id="result">
+	</div>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.ajax-cross-origin.min.js"></script>
+	<script>
+		let searchParams = new URLSearchParams(window.location.search);
+		let param='';
+		if(searchParams.has('region')){
+			param = searchParams.get('region');
+			console.log(param);
+		}
+		coronaRead(param);
+
+		function coronaRead(elm){
+			elm = elm==''?'empty':elm;
+			$.ajax({
+				type: 'GET',
+				crossOrigin: true,
+				url: 'http://onesunny3.cafe24.com/crawler/coronaDataRead.php',
+				contentType: false,
+				data: false,
+				processData: false,
+				success: function (data) {
+					isUploading = false;
+					var obj = JSON.parse(data);
+					var vodHTML = "";
+
+					if(obj.result =="success"){
+						var selectStr ='';
+						var str = '';
+						var coronaData = obj.data;
+						var coronaDataLength = coronaData.length;
+
+						var targetId = 0;
+						if(elm=='empty'){
+							 selectStr += '<option selected>select Region</option>';
+						}
+
+						var elmTepm = elm.split('@');
+						for (var i=1;i<coronaDataLength ;i++ )
+						{
+							if(coronaData[i]['Province/State']==elmTepm[0]&&coronaData[i]['Country/Region']==elmTepm[1]){
+								targetId = i;
+								selectStr +='<option selected value="'+coronaData[i]['Province/State']+'@'+coronaData[i]['Country/Region']+'">'+coronaData[i]['Province/State']+' / '+coronaData[i]['Country/Region']+'</option>';
+							}else{
+								selectStr +='<option value="'+coronaData[i]['Province/State']+'@'+coronaData[i]['Country/Region']+'">'+coronaData[i]['Province/State']+' / '+coronaData[i]['Country/Region']+'</option>';
+							}
+						}
+						if(elm=='empty'){
+							str +='<ul>';
+								str +='<li>select Results</li>';
+							str +='</ul>';
+						}else{
+							str +='<ul>';
+								str +='<li>Province/State : '+coronaData[targetId]['Province/State']+'</li>';
+								str +='<li>Country/Region : '+coronaData[targetId]['Country/Region']+'</li>';
+								str +='<li>Last Update : '+coronaData[targetId]['Last Update']+'</li>';
+								str +='<li>Confirmed : '+coronaData[targetId]['Confirmed']+'</li>';
+								str +='<li>Deaths : '+coronaData[targetId]['Deaths']+'</li>';
+								str +='<li>Recovered : '+coronaData[targetId]['Recovered']+'</li>';
+							str +='</ul>'
+						}
+
+						$('#region').html(selectStr);
+						$('#result').html(str);
+					}
+				}
+			});
+		}
+	</script>
+	</body>
+</html>
