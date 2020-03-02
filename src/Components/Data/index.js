@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 export default class Data extends Component{
     constructor(){
@@ -47,6 +47,8 @@ export default class Data extends Component{
         )
     }
 }
+
+//    <li key={item.ProvinceState} ProvinceState={item.ProvinceState}>{item.CountryRegion + " " + item.CountryRegion}</li>
 // {"ProvinceState":"Hubei",
 // "CountryRegion":"Mainland China",
 // "LastUpdate":"2020-02-26T14:13:10","Confirmed":"65187","Deaths":"2615","Recovered":"20969"},

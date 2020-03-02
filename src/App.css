@@ -29,30 +29,3 @@
     transform: rotate(360deg);
   }
 }
-
-.linebreak{
-  white-space: pre;
-}
-/* line break */
-.blueBox{
-  border-radius: 8px;
-  background-color: #039bef;
-  }
-
-.redBox{
-  border-radius: 8px;
-  background-color: red;
-  }
-
-
-.greenBox{
-  border-radius: 8px;
-  background-color: green;
-
-  }
-
-.yellowBox{
-  border-radius: 8px;
-  background-color: yellow;
-
-  }
