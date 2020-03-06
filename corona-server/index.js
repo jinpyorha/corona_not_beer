@@ -5,7 +5,7 @@ const mysql = require('mysql');
 
 const app = express();
 
-const SELECT_ALL_CASES_QUERY ='SELECT * FROM CoronaData';
+const SELECT_ALL_CASES_QUERY ='SELECT * FROM coronaData';
 
 const connection = mysql.createConnection({
   host:'localhost',
@@ -25,7 +25,7 @@ connection.connect(err=>{
 app.use(cors());
 
 app.get('/',(req,res)=>{
-  res.send('go to /CoronaData to see data')
+  res.send('go to /coronaData to see data')
 });
 
 // app.get('/CoronaData/add', (req, res) => {
@@ -41,7 +41,7 @@ app.get('/',(req,res)=>{
 //   });
 // });
 
-app.get('/CoronaData', (req, res)=>{
+app.get('/coronaData', (req, res)=>{
   connection.query(SELECT_ALL_CASES_QUERY, (err,results) => {
     if(err){
       return res.send(err)
