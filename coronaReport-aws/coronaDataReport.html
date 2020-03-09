@@ -1,0 +1,302 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>corona not beer</title>
+		<meta property="og:image" content="http://13.58.243.149/corona/corona.jpg"/>
+		<meta property="og:url" content="http://13.58.243.149/corona/report"/>
+		<meta property="og:description" content="corona daily report-confirmed,deaths,recovery"/>
+		<meta property="og:title" content="Corona Not Beer"/>
+
+		<style>
+			table{border:1px solid #444;border-collapse:collapse;margin-top:30px;width:100%;}
+			th,td{border:1px solid #ccc;padding:10px; word-break: break-all;font-size:10px;}
+			td.red{color:red}
+			td.blue{color:blue;}
+			h3{margin-top:50px;}
+			select{border:none;border:1px solid #ccc;border-radius:5px;background:#fff;padding:12px 10px;width:100%;box-sizing:border-box;font-size:16px;}
+			.colors{overflow: hidden;margin-bottom:20px;}
+			.colors .color{display: inline-block;border-radius: 50%;width:10px;height:10px;margin-right:5px;}
+			.colors .color.red{background:#EB7F75}
+			.colors .color.yellow{background:#FFDC73}
+			.colors .color.blue{background:#8FDAFF}
+			.colors .label{display: inline-block;margin-right:10px;font-size:12px;color:#333;}
+		</style>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-116931667-5"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'UA-116931667-5');
+		</script>
+
+	</head>
+	<body>
+		<div id="columnchart_confirmed" ></div>
+		<div id="linechart_confirmed_increase" ></div>
+		<div id="columnchart_death" ></div>
+		<div id="columnchart_recovered" ></div>
+		<div id="colors"></div>
+		<div id="report">
+		</div>
+
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script>
+
+			coronaReport('','');
+
+			function coronaReport(ProvinceState,CountryRegion){
+				//console.log('onesunny3.cafe24.com/crawler/coronaDataApi.php?ProvinceState='+ProvinceState+'&CountryRegion='+CountryRegion);
+			$.ajax({
+				type: 'GET',
+				url:'coronaDataApi.php?ProvinceState='+ProvinceState+'&CountryRegion='+CountryRegion,
+				contentType: false,
+				data: false,
+				processData: false,
+				success: function (data) {
+					isUploading = false;
+					var obj = JSON.parse(data);
+					//console.log(data);
+					var vodHTML = "";
+
+					if(obj.result =="success"){
+						var dataElmConfirmed =[]; //data Array for column chart
+						var dataElmDeath =[]; //data Array for column chart
+						var dataElmRecovered =[]; //data Array for column chart
+						var dataElmIncrease = [];//전체 데이터 위한 배열
+						var selectStr ='';
+						var countryList = obj.data.countryList;
+						var countryData = obj.data.countryData;
+						var countryListLength = countryList.length;
+						selectStr +='<h3>국가별 검색 search by country</h3>'
+						selectStr +='<select id="countryList">';
+							selectStr+='<option>select Region(confirmed count)</option>';
+						for(var i =0;i<countryListLength;i++){
+							if(countryList[i]['ProvinceState']==ProvinceState&&countryList[i]['CountryRegion']==CountryRegion){
+								selectStr+='<option  selected value="'+countryList[i]['ProvinceState']+'@'+countryList[i]['CountryRegion']+'">'+countryList[i]['ProvinceState']+'['+countryList[i]['CountryRegion']+']('+countryList[i]['cnt']+')</option>';
+							}else{
+								selectStr+='<option value="'+countryList[i]['ProvinceState']+'@'+countryList[i]['CountryRegion']+'">'+countryList[i]['ProvinceState']+'['+countryList[i]['CountryRegion']+']('+countryList[i]['cnt']+')</option>';
+							}
+
+						}
+						selectStr+='</select>';
+						var conditionStr='';
+						var reportStr ='';
+						//console.log(countryData);
+						if(countryData ==null){
+							reportStr+='<h3>지역명(확진자 수)</h3>';
+							reportStr+='지역은 확진자 많은 순으로 정렬되어있습니다.';
+
+						}
+						if(countryData !=null){
+							var countryDataLength =  countryData.length;
+							//console.log( countryDataLength );
+							reportStr+='<h3>'+ProvinceState+'['+CountryRegion+']</h3>';
+							//reportStr+='<p>order by confirmed count desc</p>';
+							reportStr+='<table>';
+								reportStr+='<col width="60px">';
+								reportStr+='<col width="10px">';
+								reportStr+='<col width="10px">';
+								reportStr+='<col width="10px">';
+								reportStr+='<col width="10px">';
+								reportStr +='<thead><tr>';
+									reportStr+='<th>DataDate</th>';
+									//reportStr+='<th>ProvinceState</th>';
+									//reportStr+='<th>CountryRegion</th>';
+									reportStr+='<th>Confirmed</th>';
+									reportStr+='<th>Increase</th>';
+									reportStr+='<th>Deaths</th>';
+									reportStr+='<th>Recovered</th>';
+								reportStr+='</tr></thead>';
+								reportStr+='<tbody>';
+							for(var i=0;i<countryDataLength;i++){
+
+								reportStr+='<tr>';
+									reportStr+='<td>'+countryData [i]['DataDate']+'</td>';
+									//reportStr+='<td>'+countryData [i]['ProvinceState']+'</td>';
+									//reportStr+='<td>'+countryData [i]['CountryRegion']+'</td>';
+									reportStr+='<td>'+countryData [i]['Confirmed']+'</td>';
+									if(countryData [i]['Increase']>0){
+									reportStr+='<td class="red">+'+countryData [i]['Increase']+'</td>';
+									}else{
+									reportStr+='<td class="blue">+'+countryData [i]['Increase']+'</td>';
+									}
+									reportStr+='<td>'+countryData [i]['Deaths']+'</td>';
+									reportStr+='<td>'+countryData [i]['Recovered']+'</td>';
+								reportStr+='</tr>';
+
+								//tempData = [countryData [i]['DataDate'], countryData [i]['Confirmed']];
+
+								tempDataConfirmed = [countryData [i]['DataDate'], countryData [i]['Confirmed']]; //array push for column chart
+								tempDataDeath = [countryData [i]['DataDate'], countryData [i]['Deaths']]; //array push for column chart
+								tempDataRecovered = [countryData [i]['DataDate'], countryData [i]['Recovered']]; //array push for column chart
+								tempDataIncrease =  [countryData [i]['DataDate'], countryData [i]['Increase']]; //array push for column chart
+								dataElmConfirmed.unshift(tempDataConfirmed);//array push for column chart
+								dataElmDeath.unshift(tempDataDeath);//array push for column chart
+								dataElmRecovered.unshift(tempDataRecovered);//array push for column chart
+								dataElmIncrease.unshift(tempDataIncrease);//array push for column chart
+
+							}
+							reportStr+='</tbody>';
+							reportStr+='</table>';
+
+							conditionStr +='<div class="colors">';
+								conditionStr+='<div class="color red"></div><div class="label">Confirmed Count</div>';
+								conditionStr+='<div class="color yellow"></div><div class="label">Death Count</div>';
+								conditionStr+='<div class="color blue"></div><div class="label">Recovered Count</div>';
+							conditionStr+='</div>'
+						}
+
+						$('#report').html(selectStr+reportStr);
+						$('#colors').html(conditionStr);
+						//console.log(dataCorona);
+						//console.log(dataElm);
+
+						//var tempData =['DateDate', 'Confirmed'];
+						var tempDataConfirmed =['DateDate', 'Confirmed'];
+						var tempDataDeath =['DateDate','Deaths'];
+						var tempDataRecovered =['DateDate', 'Recovered'];
+						var tempDataIncrease =['DateDate', 'Increase'];
+						dataElmConfirmed.unshift(tempDataConfirmed);//array push for column chart
+						dataElmDeath.unshift(tempDataDeath);//array push for column chart
+						dataElmRecovered.unshift(tempDataRecovered);//array push for column chart
+						dataElmIncrease.unshift(tempDataIncrease);//array push for column chart
+
+						if(countryData !=null){
+						  google.charts.load('current', {'packages':['bar']});
+						  google.charts.setOnLoadCallback(drawConfirmedChart);
+							google.charts.setOnLoadCallback(drawDeathChart);
+							google.charts.setOnLoadCallback(drawRecoveredChart);
+							google.charts.load('current', {packages: ['corechart', 'line']});
+							google.charts.setOnLoadCallback(drawIncreaseChart);
+						}
+
+						  function drawConfirmedChart() {
+
+							 var data = google.visualization.arrayToDataTable(dataElmConfirmed);
+
+							//https://developers.google.com/chart/interactive/docs/gallery/piechart?hl=ko#Configuration_Options
+							//collumn chart customization - options
+							//=>https://developers.google.com/chart/interactive/docs/gallery/columnchart
+
+							var options = {
+								title:'확진자 누적수',
+								legend: { position: "none"},
+								chart: {
+
+									//title: 'Company Performance',
+									//subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+								  },
+							   colors: ['#EB7F75'],
+							   vAxis: {
+									 viewWindowMode:'explicit',
+									 viewWindow:{
+										 min:0,
+									 },
+									 mainValue:0,
+									 gridlines: { color: '#f0f0f0',count:-1}
+								 },
+							};
+
+							var chart = new google.charts.Bar(document.getElementById('columnchart_confirmed'));
+
+							chart.draw(data, google.charts.Bar.convertOptions(options));
+						  }
+
+							function drawDeathChart() {
+
+							 var data = google.visualization.arrayToDataTable(dataElmDeath);
+
+							//https://developers.google.com/chart/interactive/docs/gallery/piechart?hl=ko#Configuration_Options
+							//collumn chart customization - options
+							//=>https://developers.google.com/chart/interactive/docs/gallery/columnchart
+
+							var options = {
+								title:'사망자 누적수',
+								legend: { position: "none"},
+								chart: {
+
+									//title: 'Company Performance',
+									//subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+								  },
+							   colors: ['#FFDC73'],
+							   vAxis: { gridlines: { color: '#f0f0f0', minSpacing: 20,count:-1}},
+							};
+
+							var chart = new google.charts.Bar(document.getElementById('columnchart_death'));
+
+							chart.draw(data, google.charts.Bar.convertOptions(options));
+						  }
+
+							function drawRecoveredChart() {
+
+							 var data = google.visualization.arrayToDataTable(dataElmRecovered);
+
+							//https://developers.google.com/chart/interactive/docs/gallery/piechart?hl=ko#Configuration_Options
+							//collumn chart customization - options
+							//=>https://developers.google.com/chart/interactive/docs/gallery/columnchart
+
+							var options = {
+								title :'회복자 누적수',
+								legend: { position: "none"},
+								chart: {
+
+									//title: 'Company Performance',
+									//subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+								  },
+							   colors: ['#8FDAFF'],//
+							   vAxis: { gridlines: { color: '#f0f0f0', minSpacing: 20,count:-1}},
+							};
+
+							var chart = new google.charts.Bar(document.getElementById('columnchart_recovered'));
+
+							chart.draw(data, google.charts.Bar.convertOptions(options));
+						  }
+
+							function drawIncreaseChart() {
+
+					      //var data = new google.visualization.DataTable();
+								var data = google.visualization.arrayToDataTable(dataElmIncrease);
+
+					      var options = {
+									title:'일별 확진자 증가수',
+									colors: ['#EB7F75'],
+									legend: { position: "none"},
+					        hAxis: {
+					          title: 'Time'
+					        },
+					        vAxis: {
+					          title: 'daily increase(confirmed)'
+					        }
+					      };
+
+					      var chart = new google.visualization.LineChart(document.getElementById('linechart_confirmed_increase'));
+
+					      chart.draw(data, options);
+					    }
+
+						//내부함수
+						$(function(){
+							$('#countryList').change(function(){
+								//console.log(this.value);
+								var regionArray = this.value.split('@');
+								coronaReport(regionArray [0],regionArray [1]);
+							});
+						});
+
+						//내부함수 끝
+					}
+				}
+
+
+			});
+
+
+		}
+		</script>
+	</body>
+</html>
